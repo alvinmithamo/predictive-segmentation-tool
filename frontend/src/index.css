@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-white/10;
+  }
+  body {
+    @apply bg-surface-950 text-white font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /* ── Glass Cards ── */
+  .glass-card {
+    @apply bg-surface-800/60 backdrop-blur-md border border-white/10 rounded-2xl shadow-glass;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-500 active:scale-95 text-white font-semibold 
+           px-6 py-3 rounded-xl transition-all duration-200 shadow-lg 
+           hover:shadow-primary-600/30 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-700 hover:bg-surface-600 active:scale-95 text-white font-medium
+           px-5 py-2.5 rounded-xl transition-all duration-200 border border-white/10;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-white/5 active:scale-95 text-white/70 hover:text-white 
+           px-4 py-2 rounded-lg transition-all duration-200;
+  }
+
+  /* ── Form inputs ── */
+  .input {
+    @apply w-full bg-surface-700 border border-white/10 text-white placeholder:text-white/40
+           rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 
+           focus:border-transparent transition-all duration-200;
+  }
+
+  /* ── KPI cards ── */
+  .kpi-card {
+    @apply glass-card p-5 flex flex-col gap-2;
+  }
+
+  /* ── Sidebar nav item ── */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white 
+           hover:bg-white/5 transition-all duration-200 text-sm font-medium cursor-pointer;
+  }
+
+  .nav-item.active {
+    @apply bg-primary-600/20 text-primary-400 border border-primary-600/30;
+  }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    @apply w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-widest text-white/30 px-4 mb-2;
+  }
+
+  /* ── Alert strip ── */
+  .alert-info {
+    @apply bg-blue-500/10 border border-blue-500/30 text-blue-200 rounded-xl px-4 py-3 text-sm;
+  }
+
+  .alert-error {
+    @apply bg-primary-500/10 border border-primary-500/30 text-primary-200 rounded-xl px-4 py-3 text-sm;
+  }
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
+
+/* ── Gradient mesh background for hero sections ── */
+.mesh-bg {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(232, 80, 74, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(36, 51, 88, 0.6) 0%, transparent 70%);
+}
