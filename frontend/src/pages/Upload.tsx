@@ -84,7 +84,8 @@ export default function Upload() {
             // Redirect to history for now, or dashboard
             navigate('/dashboard/history');
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Analysis failed. Please check your column mapping.');
+            const message = err.response?.data?.detail || err.message || 'Analysis failed. Please check your network connection and session.';
+            setError(message);
         } finally {
             setIsAnalyzing(false);
         }
@@ -105,8 +106,8 @@ export default function Upload() {
                 </h1>
                 <p className="text-white/50 mt-1">
                     {step === 1
-                        ? 'Upload your CSV transaction data (M-Pesa, POS, or Excel export) to start.'
-                        : 'Confirm which columns in your file represent the key transaction data.'}
+                        ? 'Upload your CSV transaction data (M-Pesa, POS, or Excel export) to start. (v2.0)'
+                        : 'Confirm which columns in your file represent the key transaction data. (v2.0)'}
                 </p>
             </div>
 
