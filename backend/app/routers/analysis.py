@@ -9,8 +9,9 @@ from typing import List, Dict, Any
 
 import logging
 import os
+import traceback
 
-# Simplified logging to avoid reload issues
+# Simplified logging
 logger = logging.getLogger(__name__)
 
 from app.core.database import get_db
@@ -18,7 +19,7 @@ from app.core.security import get_current_user
 from app.models.db import User, Analysis
 from app.models.schemas import ColumnMapping, AnalysisResult, SegmentSummary
 
-router = APIRouter(prefix="/api/analysis", tags=["Analysis"])
+router = APIRouter(prefix="/analysis", tags=["Analysis"])
 
 UPLOAD_DIR = "uploads"
 
@@ -76,6 +77,7 @@ def calculate_rfm(df: pd.DataFrame, mapping: ColumnMapping) -> List[SegmentSumma
     segments = []
     total_rev = rfm['Monetary'].sum()
     
+    print(f"DEBUG: Summarizing {len(rfm)} rows into segments...")
     summary = rfm.groupby(['Segment', 'Segment_SW', 'Risk', 'Rec']).agg({
         'Monetary': ['mean', 'sum'],
         'Recency': 'mean',
@@ -83,6 +85,7 @@ def calculate_rfm(df: pd.DataFrame, mapping: ColumnMapping) -> List[SegmentSumma
         'RFM_Score': 'count'
     }).reset_index()
     
+    print(f"DEBUG: Summary columns: {summary.columns.tolist()}")
     summary.columns = ['Segment', 'Segment_SW', 'Risk', 'Recommendation', 'Avg_M', 'Total_M', 'Avg_R', 'Avg_F', 'Count']
     
     for i, row in summary.iterrows():
@@ -203,12 +206,11 @@ async def run_analysis(
         return result
 
     except Exception as e:
-        logger.exception(f"ANALYSIS EXCEPTION: {str(e)}")
+        print(f"!!! ANALYSIS CRASHED !!!")
+        traceback.print_exc()
         analysis.status = "failed"
         analysis.error_message = str(e)
         db.commit()
-        # Log the error for debugging
-        print(f"ANALYSIS ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 @router.get("", response_model=List[Dict[str, Any]])
