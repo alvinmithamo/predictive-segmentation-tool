@@ -35,6 +35,17 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+from fastapi import Request
+import time
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    print(f"REQUEST: {request.method} {request.url} - STATUS: {response.status_code} - DURATION: {duration:.4f}s")
+    return response
+
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
@@ -45,14 +56,12 @@ app.add_middleware(
 )
 
 # ─── Routers ──────────────────────────────────────────────────────────────────
-app.include_router(auth.router)
-app.include_router(upload.router)
-app.include_router(analysis.router)
-# Future phases will add:
-# app.include_router(analysis.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(upload.router, prefix="/api")
+app.include_router(analysis.router, prefix="/api")
 
 
 # ─── Health Check ─────────────────────────────────────────────────────────────
-@app.get("/health", tags=["Health"])
+@app.get("/api/health", tags=["Health"])
 def health_check():
     return {"status": "ok", "app": settings.APP_NAME}
