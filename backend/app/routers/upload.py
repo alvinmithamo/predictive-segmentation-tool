@@ -11,7 +11,7 @@ from app.core.security import get_current_user
 from app.models.db import User, Analysis
 from app.models.schemas import UploadResponse, ColumnMapping
 
-router = APIRouter(prefix="/api/upload", tags=["Upload"])
+router = APIRouter(prefix="/upload", tags=["Upload"])
 
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
