@@ -12,10 +12,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // Proxy all /api and /auth calls to FastAPI during development
-      '/api': { target: 'http://localhost:8001', changeOrigin: true },
-      '/auth': { target: 'http://localhost:8001', changeOrigin: true },
-      '/health': { target: 'http://localhost:8001', changeOrigin: true },
+      // Proxy all /api calls to FastAPI during development
+      '/api': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
 })
