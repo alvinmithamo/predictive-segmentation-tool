@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
     Users, TrendingUp, AlertTriangle, ArrowLeft, Download,
-    Calendar, FileText, CheckCircle2, Loader2, Info, ArrowRight
+    Calendar, FileText, CheckCircle2, Loader2, Info, ArrowRight,
+    BarChart3, Lightbulb, Target
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import api from '../lib/api';
@@ -66,6 +67,13 @@ export default function AnalysisDetails() {
 
     if (!data) return null;
 
+    const navTabs = [
+        { id: 'overview', label: 'Overview', icon: <BarChart3 className="w-4 h-4" />, href: '#' },
+        { id: 'segments', label: 'Segments', icon: <Users className="w-4 h-4" />, href: `/dashboard/analysis/${id}/segments` },
+        { id: 'predictions', label: 'Predictions', icon: <Lightbulb className="w-4 h-4" />, href: `/dashboard/analysis/${id}/predictions` },
+        { id: 'recommendations', label: 'Recommendations', icon: <Target className="w-4 h-4" />, href: `/dashboard/analysis/${id}/recommendations` },
+    ];
+
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
             {/* Header */}
@@ -86,6 +94,30 @@ export default function AnalysisDetails() {
                 <button className="btn-primary flex items-center gap-2 px-6 bg-white/5 border-white/10 hover:bg-white/10">
                     <Download className="w-4 h-4" /> Download Report
                 </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex gap-2 border-b border-white/10 overflow-x-auto">
+                {navTabs.map((tab) => (
+                    tab.href === '#' ? (
+                        <div
+                            key={tab.id}
+                            className="px-4 py-3 text-sm font-medium border-b-2 border-primary-500 text-white flex items-center gap-2 whitespace-nowrap"
+                        >
+                            {tab.icon}
+                            {tab.label}
+                        </div>
+                    ) : (
+                        <Link
+                            key={tab.id}
+                            to={tab.href}
+                            className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-white/50 hover:text-white transition-colors flex items-center gap-2 whitespace-nowrap"
+                        >
+                            {tab.icon}
+                            {tab.label}
+                        </Link>
+                    )
+                ))}
             </div>
 
             {/* Quick Stats */}
@@ -163,11 +195,122 @@ export default function AnalysisDetails() {
                 </div>
             </div>
 
+            {/* Quick Segment Overview */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-2xl font-bold">Segment Snapshot</h3>
+                    <Link to={`/dashboard/analysis/${id}/segments`} className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center gap-2">
+                        View Details <ArrowRight className="w-4 h-4" />
+                    </Link>
+                </div>
+                <div className="grid gap-4">
+                    {data.segments.sort((a, b) => b.total_monetary - a.total_monetary).slice(0, 3).map((s, i) => (
+                        <div key={i} className="glass-card p-6 flex items-center justify-between border-l-4" style={{ borderColor: COLORS[i % COLORS.length] }}>
+                            <div>
+                                <h4 className="font-bold text-lg">{s.segment_name} <span className="text-primary-400 text-sm font-normal italic">({s.segment_name_sw})</span></h4>
+                                <p className="text-white/50 text-sm mt-1">
+                                    {s.customer_count.toLocaleString()} customers · KSh {Math.round(s.avg_monetary).toLocaleString()} avg spend · {s.revenue_share.toFixed(1)}% revenue share
+                                </p>
+                            </div>
+                            <div className={`px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider
+                                ${s.churn_risk === 'low' ? 'bg-emerald-500/10 text-emerald-400' :
+                                    s.churn_risk === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
+                                Risk: {s.churn_risk}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Call-to-Action Cards */}
+            <div className="grid md:grid-cols-3 gap-6">
+                <Link
+                    to={`/dashboard/analysis/${id}/segments`}
+                    className="glass-card p-6 hover:bg-white/5 transition-colors border-l-4 border-primary-500 group"
+                >
+                    <Users className="w-6 h-6 text-primary-400 mb-3 group-hover:scale-110 transition-transform" />
+                    <h4 className="font-bold mb-1">Explore Segments</h4>
+                    <p className="text-white/50 text-sm">Detailed breakdown of each segment with full analytics.</p>
+                </Link>
+
+                <Link
+                    to={`/dashboard/analysis/${id}/predictions`}
+                    className="glass-card p-6 hover:bg-white/5 transition-colors border-l-4 border-yellow-500 group"
+                >
+                    <Lightbulb className="w-6 h-6 text-yellow-400 mb-3 group-hover:scale-110 transition-transform" />
+                    <h4 className="font-bold mb-1">View Predictions</h4>
+                    <p className="text-white/50 text-sm">Churn risk curves, LTV projections, and cohort analysis.</p>
+                </Link>
+
+                <Link
+                    to={`/dashboard/analysis/${id}/recommendations`}
+                    className="glass-card p-6 hover:bg-white/5 transition-colors border-l-4 border-emerald-500 group"
+                >
+                    <Target className="w-6 h-6 text-emerald-400 mb-3 group-hover:scale-110 transition-transform" />
+                    <h4 className="font-bold mb-1">Get Recommendations</h4>
+                    <p className="text-white/50 text-sm">Actionable marketing strategies tailored for each segment.</p>
+                </Link>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid lg:grid-cols-2 gap-6">
+                <div className="glass-card p-8 flex flex-col h-[450px]">
+                    <div className="mb-6">
+                        <h3 className="text-xl font-bold">Customer Segments</h3>
+                        <p className="text-white/40 text-sm">Distribution of your customer base across groups.</p>
+                    </div>
+                    <div className="flex-1 min-h-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={data.segment_chart_data}
+                                    innerRadius={80}
+                                    outerRadius={120}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {data.segment_chart_data.map((_: any, index: number) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{ background: '#0a0a0b', border: '1px solid #27272a', borderRadius: '12px' }}
+                                    itemStyle={{ color: '#fff' }}
+                                />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Revenue per Segment */}
+                <div className="glass-card p-8 flex flex-col h-[450px]">
+                    <div className="mb-6">
+                        <h3 className="text-xl font-bold">Revenue Performance</h3>
+                        <p className="text-white/40 text-sm">How much each group contributes to your total sales.</p>
+                    </div>
+                    <div className="flex-1 min-h-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={data.segments}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                <XAxis dataKey="segment_name" stroke="#52525b" fontSize={11} />
+                                <YAxis stroke="#52525b" fontSize={11} />
+                                <Tooltip
+                                    contentStyle={{ background: '#0a0a0b', border: '1px solid #27272a', borderRadius: '12px' }}
+                                    itemStyle={{ color: '#fff' }}
+                                />
+                                <Bar dataKey="total_monetary" fill="#10b981" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
             {/* Detailed Segment Cards */}
             <div className="space-y-6">
                 <h3 className="text-2xl font-bold">Recommended Actions</h3>
                 <div className="grid gap-6">
-                    {data.segments.sort((a, b) => b.total_monetary - a.total_monetary).map((s, i) => (
+                    {data.segments.sort((a: Segment, b: Segment) => b.total_monetary - a.total_monetary).map((s: Segment, i: number) => (
                         <div key={i} className="glass-card hover:bg-white/5 transition-colors overflow-hidden border-l-4" style={{ borderColor: COLORS[i % COLORS.length] }}>
                             <div className="p-8 flex flex-col lg:flex-row gap-8">
                                 <div className="lg:w-1/3">
