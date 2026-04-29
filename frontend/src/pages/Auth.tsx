@@ -65,9 +65,14 @@ export default function Auth() {
             }
             navigate('/dashboard');
         } catch (err: unknown) {
-            const msg =
-                (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
-                'Something went wrong. Please try again.';
+            console.error('Auth error:', err);
+            let msg = 'Something went wrong. Please try again.';
+            if (err && typeof err === 'object') {
+                const error = err as any;
+                msg = error?.response?.data?.detail || 
+                      error?.message || 
+                      msg;
+            }
             setError(msg);
         } finally {
             setLoading(false);
