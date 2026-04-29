@@ -93,6 +93,33 @@ class AnalysisSummary(BaseModel):
         from_attributes = True
 
 
+# ─── Prediction Schemas ──────────────────────────────────────────────────────
+
+class ChurnPredictionData(BaseModel):
+    high_risk_count: int         # Customers with >70% churn probability
+    medium_risk_count: int       # Customers with 50-70% churn probability
+    low_risk_count: int          # Customers with <50% churn probability
+    avg_churn_probability: float # Average churn probability across all customers
+
+
+class LTVPredictionData(BaseModel):
+    avg_projected_ltv: float     # KSh - Average LTV in 12 months
+    high_value_customers: int    # Count of customers in top 25% by LTV
+    ltv_by_segment: Dict[str, float]  # Average projected LTV per segment
+
+
+class FeatureImportanceItem(BaseModel):
+    feature: str
+    importance: float
+    interpretation: str
+    action: str
+
+
+class CohortRetentionData(BaseModel):
+    repeat_purchase_rate: float  # % of customers with repeat purchases
+    avg_retention_months: float  # Average months customer stays active
+
+
 class AnalysisResult(BaseModel):
     analysis_id: str
     filename: str
@@ -105,3 +132,9 @@ class AnalysisResult(BaseModel):
     avg_ltv: float               # KSh
     rfm_chart_data: List[Dict]   # for scatter plot
     segment_chart_data: List[Dict]  # for bar/pie charts
+    
+    # ML Predictions (NEW)
+    churn_prediction: Optional[ChurnPredictionData] = None
+    ltv_prediction: Optional[LTVPredictionData] = None
+    feature_importance: Optional[List[FeatureImportanceItem]] = None
+    cohort_retention: Optional[CohortRetentionData] = None
