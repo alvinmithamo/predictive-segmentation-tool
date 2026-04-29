@@ -16,8 +16,13 @@ logger = logging.getLogger(__name__)
 
 from app.core.database import get_db
 from app.core.security import get_current_user
+from app.core.ml_models import run_full_ml_pipeline
 from app.models.db import User, Analysis
-from app.models.schemas import ColumnMapping, AnalysisResult, SegmentSummary
+from app.models.schemas import (
+    ColumnMapping, AnalysisResult, SegmentSummary,
+    ChurnPredictionData, LTVPredictionData, CohortRetentionData,
+    FeatureImportanceItem
+)
 
 router = APIRouter(prefix="/analysis", tags=["Analysis"])
 
@@ -172,6 +177,20 @@ async def run_analysis(
         segments = calculate_rfm(df.copy(), mapping)
         logger.info(f"RFM Done. Segments found: {len(segments)}")
         
+        # 4.5 Run ML Pipeline (NEW)
+        logger.info("Running ML prediction pipeline...")
+        segment_names = [s.segment_name for s in segments]
+        rfm_for_ml = df.groupby(mapping.customer_id).agg({
+            mapping.transaction_date: lambda x: (df[mapping.transaction_date].max() - x.max()).days,
+            mapping.customer_id: 'count',
+            mapping.amount: 'sum'
+        }).copy()
+        rfm_for_ml.columns = ['Recency', 'Frequency', 'Monetary']
+        rfm_for_ml.reset_index(drop=True, inplace=True)
+        
+        ml_results = run_full_ml_pipeline(df, rfm_for_ml, segment_names, mapping)
+        logger.info(f"ML pipeline completed. Churn high-risk: {ml_results.get('churn', {}).get('high_risk_count', 0)}")
+        
         # 5. Save results
         total_customers = df[mapping.customer_id].nunique()
         total_revenue = df[mapping.amount].sum()
@@ -179,6 +198,44 @@ async def run_analysis(
         # Handle date range safely
         min_date = df[mapping.transaction_date].min()
         max_date = df[mapping.transaction_date].max()
+        
+        # Parse ML results
+        churn_pred = None
+        if 'churn' in ml_results and ml_results['churn']:
+            churn_pred = ChurnPredictionData(
+                high_risk_count=ml_results['churn'].get('high_risk_count', 0),
+                medium_risk_count=ml_results['churn'].get('medium_risk_count', 0),
+                low_risk_count=ml_results['churn'].get('low_risk_count', 0),
+                avg_churn_probability=ml_results['churn'].get('avg_churn_probability', 0)
+            )
+        
+        ltv_pred = None
+        if 'ltv' in ml_results and ml_results['ltv']:
+            ltv_pred = LTVPredictionData(
+                avg_projected_ltv=ml_results['ltv'].get('avg_projected_ltv', 0),
+                high_value_customers=ml_results['ltv'].get('high_value_customers', 0),
+                ltv_by_segment=ml_results['ltv'].get('ltv_by_segment', {})
+            )
+        
+        feature_importance = None
+        if 'feature_importance' in ml_results and ml_results['feature_importance']:
+            global_features = ml_results['feature_importance'].get('global', [])
+            feature_importance = [
+                FeatureImportanceItem(
+                    feature=f.get('feature', ''),
+                    importance=f.get('importance', 0),
+                    interpretation=f.get('interpretation', ''),
+                    action=f.get('action', '')
+                )
+                for f in global_features
+            ]
+        
+        cohort_ret = None
+        if 'cohort' in ml_results and ml_results['cohort']:
+            cohort_ret = CohortRetentionData(
+                repeat_purchase_rate=ml_results['cohort'].get('repeat_purchase_rate', 0),
+                avg_retention_months=ml_results['cohort'].get('avg_retention_months', 0)
+            )
         
         result = AnalysisResult(
             analysis_id=upload_id,
@@ -194,7 +251,11 @@ async def run_analysis(
             churn_risk_count=sum(s.customer_count for s in segments if s.churn_risk == "high"),
             avg_ltv=float(total_revenue / total_customers) if total_customers > 0 else 0,
             rfm_chart_data=[], 
-            segment_chart_data=[{"name": s.segment_name, "value": s.customer_count} for s in segments]
+            segment_chart_data=[{"name": s.segment_name, "value": s.customer_count} for s in segments],
+            churn_prediction=churn_pred,
+            ltv_prediction=ltv_pred,
+            feature_importance=feature_importance,
+            cohort_retention=cohort_ret
         )
 
         analysis.status = "done"
