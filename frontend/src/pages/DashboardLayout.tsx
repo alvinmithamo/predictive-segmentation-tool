@@ -3,12 +3,14 @@ import {
     BarChart3, Upload, History, Settings, LogOut, LayoutDashboard, ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import PredictionsInsights from './Predictions';
 
 const navItems = [
     { path: '/dashboard', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" />, exact: true },
     { path: '/dashboard/upload', label: 'Upload Data', icon: <Upload className="w-4 h-4" /> },
     { path: '/dashboard/history', label: 'My Analyses', icon: <History className="w-4 h-4" /> },
     { path: '/dashboard/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
+    { path: '/dashboard/predictions', label: 'Predictions', icon: <PredictionsInsights /> },
 ];
 
 export default function DashboardLayout() {
