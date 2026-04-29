@@ -7,9 +7,11 @@ import Overview from './pages/Overview';
 import Upload from './pages/Upload';
 import History from './pages/History';
 import AnalysisDetails from './pages/AnalysisDetails';
+import SegmentsView from './pages/SegmentsView';
+import Predictions from './pages/Predictions';
+import RecommendationsView from './pages/Recommendations';
+import SettingsPage from './pages/Settings';
 
-// Placeholder components for other dashboard pages
-const SettingsPage = () => <div className="p-8"><h1 className="text-2xl font-bold mb-4">Account Settings</h1><p className="text-white/50">Manage your business profile and preferences.</p></div>;
 import './index.css';
 
 // Protect routes — redirect to /auth if not logged in
@@ -49,6 +51,9 @@ function AppRoutes() {
         <Route path="upload" element={<Upload />} />
         <Route path="history" element={<History />} />
         <Route path="analysis/:id" element={<AnalysisDetails />} />
+        <Route path="analysis/:id/segments" element={<SegmentsView />} />
+        <Route path="analysis/:id/predictions" element={<Predictions />} />
+        <Route path="analysis/:id/recommendations" element={<RecommendationsView />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
