@@ -60,13 +60,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const login = async (email: string, password: string) => {
-        const { data } = await api.post('/auth/login', { email, password });
-        saveSession(data);
+        try {
+            const { data } = await api.post('/auth/login', { email, password });
+            saveSession(data);
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error;
+        }
     };
 
     const register = async (formData: RegisterData) => {
-        const { data } = await api.post('/auth/register', formData);
-        saveSession(data);
+        try {
+            const { data } = await api.post('/auth/register', formData);
+            saveSession(data);
+        } catch (error) {
+            console.error('Register failed:', error);
+            throw error;
+        }
     };
 
     const logout = useCallback(() => {
