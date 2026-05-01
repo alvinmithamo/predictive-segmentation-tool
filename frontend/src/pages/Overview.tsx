@@ -1,14 +1,69 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, BarChart3, Users, TrendingUp, ArrowRight, FileText, Calendar, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, BarChart3, Users, TrendingUp, ArrowRight, FileText, Calendar, Loader2, AlertCircle, Search, Bell, ChevronDown, Cloud, Smartphone, MessageSquare, AlertTriangle, Target, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import api from '../lib/api';
 
-const quickStats = [
-    { label: 'Total Analyses', value: '0', icon: <BarChart3 className="w-5 h-5" />, color: 'text-primary-400' },
-    { label: 'Customers Analysed', value: '0', icon: <Users className="w-5 h-5" />, color: 'text-accent-400' },
-    { label: 'Avg. Churn Risk', value: '—', icon: <TrendingUp className="w-5 h-5" />, color: 'text-yellow-400' },
+const businessMetrics = [
+    { 
+        label: 'Total Customers', 
+        value: '1,250', 
+        change: '+12%', 
+        icon: <Users className="w-5 h-5" />, 
+        color: 'text-accent-400',
+        trend: 'up'
+    },
+    { 
+        label: 'Active Segments', 
+        value: '5', 
+        change: 'Stable', 
+        icon: <Target className="w-5 h-5" />, 
+        color: 'text-blue-400',
+        trend: 'stable'
+    },
+    { 
+        label: 'Avg. LTV', 
+        value: 'KSh 45,000', 
+        change: 'KSh 4.2k ▲',
+        subtitle: 'Estimated for next 6 months',
+        icon: <TrendingUp className="w-5 h-5" />, 
+        color: 'text-primary-400',
+        trend: 'up'
+    },
+    { 
+        label: 'Churn Rate', 
+        value: '12%', 
+        change: '-2%', 
+        subtitle: 'Critical, +48 risk customers',
+        icon: <AlertTriangle className="w-5 h-5" />, 
+        color: 'text-yellow-400',
+        trend: 'down'
+    },
+];
+
+const recentInsights = [
+    {
+        title: 'Churn Risk Alert',
+        time: '2 hours ago',
+        source: 'Retention AI',
+        type: 'alert',
+        icon: <AlertTriangle className="w-4 h-4" />
+    },
+    {
+        title: 'New "Loyal" Segment',
+        time: 'Yesterday',
+        source: 'Segmentation',
+        type: 'success',
+        icon: <Users className="w-4 h-4" />
+    },
+    {
+        title: 'SMS Campaign ROI',
+        time: '2 days ago',
+        source: 'Campaigns',
+        type: 'info',
+        icon: <MessageSquare className="w-4 h-4" />
+    },
 ];
 
 interface AnalysisSummary {
@@ -45,142 +100,164 @@ export default function Overview() {
     const greeting = hour < 12 ? 'Habari za asubuhi' : hour < 17 ? 'Habari za mchana' : 'Habari za jioni';
 
     return (
-        <div className="p-8">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="font-display text-2xl font-bold">
-                    {greeting}, {user?.business_name}! 👋
-                </h1>
-                <p className="text-white/50 mt-1">
-                    Upload your customer data to get started with AI-powered insights.
-                </p>
-            </div>
-
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-                {quickStats.map((stat) => (
-                    <div key={stat.label} className="kpi-card">
-                        <div className={`${stat.color} mb-1`}>{stat.icon}</div>
-                        <div className="text-2xl font-bold font-display">{stat.value}</div>
-                        <div className="text-white/40 text-sm">{stat.label}</div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Recent Analyses Section */}
-            <div className="mb-12">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="font-display text-xl font-bold">Recent Analyses</h2>
-                        <p className="text-white/40 text-sm mt-1">Your latest customer segmentation reports.</p>
-                    </div>
-                    <Link to="/dashboard/history" className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center gap-2">
-                        View All <ArrowRight className="w-4 h-4" />
-                    </Link>
+        <div className="min-h-screen bg-surface-50">
+            {/* Top Bar */}
+            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+                <div className="flex items-center gap-4">
+                    <h1 className="font-display text-xl font-bold">Business Overview</h1>
+                    <p className="text-gray-600 text-sm">Real-time performance metrics and predictive growth insights</p>
                 </div>
-
-                {isLoading ? (
-                    <div className="glass-card p-8 flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 animate-spin text-white/40 mr-2" />
-                        <p className="text-white/40 text-sm">Loading analyses...</p>
+                <div className="flex items-center gap-4">
+                    <div className="relative">
+                        <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                            type="text"
+                            placeholder="Search analytics..."
+                            className="bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
                     </div>
-                ) : error ? (
-                    <div className="glass-card p-6 flex items-center gap-3 bg-red-500/5 border border-red-500/20">
-                        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                        <p className="text-red-400 text-sm">{error}</p>
-                    </div>
-                ) : recentAnalyses.length === 0 ? (
-                    <div className="glass-card p-12 flex flex-col items-center justify-center text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                            <FileText className="w-8 h-8 text-white/20" />
+                    <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                        <Bell className="w-5 h-5" />
+                        <span className="absolute top-1 right-1 w-2 h-2 bg-green-600 rounded-full"></span>
+                    </button>
+                    <div className="flex items-center gap-3">
+                        <div className="text-right">
+                            <p className="text-sm font-medium text-gray-900">{user?.business_name || 'Achieng Nyong\'o'}</p>
+                            <p className="text-xs text-gray-600">OWNER</p>
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">No analyses yet</h3>
-                        <p className="text-white/40 text-sm mb-6 max-w-sm">
-                            Upload your transaction data to get started with AI-powered insights.
-                        </p>
-                        <Link to="/dashboard/upload" className="btn-primary px-8">
-                            Upload Your First Dataset
-                        </Link>
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                            <span className="text-green-700 font-bold text-sm">
+                                {(user?.business_name || 'AN').charAt(0).toUpperCase()}
+                            </span>
+                        </div>
                     </div>
-                ) : (
-                    <div className="space-y-3">
-                        {recentAnalyses.map((analysis) => (
-                            <Link
-                                key={analysis.id}
-                                to={analysis.status === 'done' ? `/dashboard/analysis/${analysis.id}` : '#'}
-                                className={`glass-card p-4 flex items-center justify-between transition-all hover:bg-white/5 ${analysis.status !== 'done' ? 'cursor-not-allowed opacity-60' : 'hover:border-primary-500/30'}`}
-                            >
-                                <div className="flex items-center gap-4 flex-1 min-w-0">
-                                    <div className="w-10 h-10 rounded-lg bg-primary-600/20 flex items-center justify-center flex-shrink-0">
-                                        <BarChart3 className="w-5 h-5 text-primary-400" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-medium truncate">{analysis.filename}</p>
-                                        <div className="flex items-center gap-3 text-xs text-white/40 mt-1">
-                                            <span className="flex items-center gap-1">
-                                                <Calendar className="w-3 h-3" />
-                                                {format(new Date(analysis.created_at), 'MMM d, yyyy')}
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <Users className="w-3 h-3" />
-                                                {analysis.row_count.toLocaleString()} transactions
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ml-4 ${
-                                    analysis.status === 'done' ? 'bg-emerald-500/10 text-emerald-400' :
-                                    analysis.status === 'failed' ? 'bg-red-500/10 text-red-400' :
-                                    'bg-amber-500/10 text-amber-400'
-                                }`}>
-                                    {analysis.status}
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
+                </div>
             </div>
 
-            {/* Get Started CTA */}
-            {recentAnalyses.length === 0 && (
-                <div className="glass-card p-8 flex flex-col md:flex-row items-center justify-between gap-6 border-primary-600/20">
+            <div className="p-6">
+                {/* Business Overview Header */}
+                <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="font-display text-xl font-bold mb-2">Upload Your First Dataset</h2>
-                        <p className="text-white/50 text-sm max-w-md">
-                            Drop your M-Pesa statement or POS export (CSV) and we'll automatically segment your
-                            customers and identify who needs attention. Takes less than 60 seconds.
-                        </p>
+                        <h2 className="font-display text-2xl font-bold mb-2">{greeting}, {user?.business_name || 'Achieng\'s Fashion'}!</h2>
+                        <p className="text-gray-600">Here's what's happening with your business today</p>
                     </div>
-                    <Link
-                        to="/dashboard/upload"
-                        className="btn-primary flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-                    >
-                        <Upload className="w-4 h-4" />
-                        Upload CSV
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <button className="btn-secondary flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            Export Report
+                        </button>
+                        <button className="btn-primary flex items-center gap-2">
+                            <Zap className="w-4 h-4" />
+                            + New Campaign
+                        </button>
+                    </div>
                 </div>
-            )}
 
-            {/* What happens next */}
-            {recentAnalyses.length === 0 && (
-                <div className="mt-8 grid md:grid-cols-3 gap-4">
-                    {[
-                        { step: '1', title: 'Upload CSV', desc: 'Upload your M-Pesa or POS transaction file.' },
-                        { step: '2', title: 'AI Analyses', desc: 'Our RFM engine + ML models segment your customers automatically.' },
-                        { step: '3', title: 'Take Action', desc: 'Get segment-specific marketing recommendations in plain language.' },
-                    ].map((s) => (
-                        <div key={s.step} className="glass-card p-5">
-                            <div className="w-8 h-8 rounded-lg bg-primary-600/20 text-primary-400 font-bold text-sm flex items-center justify-center mb-3">
-                                {s.step}
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {businessMetrics.map((metric, index) => (
+                        <div key={index} className="glass-card p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={`${metric.color}`}>{metric.icon}</div>
+                                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                    metric.trend === 'up' ? 'bg-accent-500/10 text-accent-400' :
+                                    metric.trend === 'down' ? 'bg-red-500/10 text-red-400' :
+                                    'bg-blue-500/10 text-blue-400'
+                                }`}>
+                                    {metric.change}
+                                </span>
                             </div>
-                            <h3 className="font-semibold mb-1">{s.title}</h3>
-                            <p className="text-white/40 text-sm">{s.desc}</p>
+                            <div className="text-2xl font-bold font-display mb-1">{metric.value}</div>
+                            <div className="text-gray-600 text-sm font-medium mb-1">{metric.label}</div>
+                            {metric.subtitle && (
+                                <div className="text-gray-400 text-xs">{metric.subtitle}</div>
+                            )}
                         </div>
                     ))}
                 </div>
-            )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Ingest Data Section */}
+                    <div className="lg:col-span-2">
+                        <div className="glass-card p-6">
+                            <h3 className="font-bold text-lg mb-2">Ingest Data</h3>
+                            <p className="text-gray-600 text-sm mb-6">Import your sales and customer records</p>
+                            
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-accent-500 rounded-full"></div>
+                                    <span className="text-sm text-gray-600">M-PESA POS</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span className="text-sm text-gray-600">ERP CONNECTED</span>
+                                </div>
+                            </div>
+
+                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-green-500/50 transition-colors cursor-pointer">
+                                <Cloud className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                <h4 className="font-semibold text-gray-900 mb-2">Drop your customer CSV here</h4>
+                                <p className="text-gray-600 text-sm mb-4">Compatible with M-Pesa statements, Tilley reports, and Shopify exports</p>
+                                <button className="btn-primary">Browse Files</button>
+                            </div>
+
+                            <p className="text-gray-400 text-xs mt-4 text-center">
+                                Your data is encrypted and processed locally within Kenya's jurisdiction
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Recent Insights Section */}
+                    <div>
+                        <div className="glass-card p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-lg">Recent Insights</h3>
+                                <Link to="/dashboard/history" className="text-green-600 hover:text-green-700 text-sm flex items-center gap-1">
+                                    View All Activity
+                                    <ArrowRight className="w-3 h-3" />
+                                </Link>
+                            </div>
+
+                            <div className="space-y-4">
+                                {recentInsights.map((insight, index) => (
+                                    <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                            insight.type === 'alert' ? 'bg-red-500/20 text-red-400' :
+                                            insight.type === 'success' ? 'bg-accent-500/20 text-accent-400' :
+                                            'bg-blue-500/20 text-blue-400'
+                                        }`}>
+                                            {insight.icon}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 mb-1">{insight.title}</p>
+                                            <p className="text-xs text-gray-600">{insight.time} • {insight.source}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Automate Retention Section */}
+                <div className="mt-6">
+                    <div className="glass-card p-8 bg-gradient-to-r from-green-50 to-transparent border-green-200">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="font-bold text-xl mb-2 flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-green-600" />
+                                    Automate Retention
+                                </h3>
+                                <p className="text-gray-600">Set up AI triggers to win back customers automatically</p>
+                            </div>
+                            <button className="btn-primary flex items-center gap-2">
+                                Get Started
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

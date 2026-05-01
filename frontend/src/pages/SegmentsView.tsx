@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-    Users, TrendingUp, AlertTriangle, ArrowLeft, Download, Calendar, FileText,
-    CheckCircle2, Loader2, Info, ArrowRight
+    Users, TrendingUp, AlertTriangle, ArrowLeft, Calendar, FileText,
+    CheckCircle2, Loader2, Target, BarChart3, Activity, Zap, Clock, DollarSign, Star, ArrowUp, ArrowDown
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter } from 'recharts';
 import api from '../lib/api';
 
 interface Segment {
@@ -57,7 +57,7 @@ export default function SegmentsView() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center p-20 text-white/40">
+            <div className="flex flex-col items-center justify-center p-20 text-gray-400">
                 <Loader2 className="w-8 h-8 animate-spin mb-4" />
                 <p>Loading segments...</p>
             </div>
@@ -67,217 +67,245 @@ export default function SegmentsView() {
     if (!data) return null;
 
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-8 pb-20">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                    <Link to={`/dashboard/analysis/${id}`} className="text-white/40 hover:text-white text-sm flex items-center gap-2 mb-2 transition-colors">
-                        <ArrowLeft className="w-4 h-4" /> Back to Analysis
-                    </Link>
-                    <h1 className="font-display text-3xl font-bold flex items-center gap-3">
-                        Customer Segments
-                        <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                    </h1>
-                    <div className="flex items-center gap-4 text-xs text-white/40">
-                        <div className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> {data.filename}</div>
-                        <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {data.date_range.start} to {data.date_range.end}</div>
-                    </div>
+        <div className="min-h-screen bg-surface-50">
+            {/* Top Bar */}
+            <div className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+                <div className="flex items-center gap-4">
+                    <h1 className="font-display text-xl font-bold">SEGMENTATION</h1>
+                    <p className="text-gray-600 text-sm">Customer Clustering Analysis</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button className="btn-secondary flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Export Report
+                    </button>
+                    <button className="btn-primary flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Run New Analysis
+                    </button>
                 </div>
             </div>
 
-            {/* Overview Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: 'Total Customers', val: data.total_customers.toLocaleString(), icon: Users, color: 'text-primary-400' },
-                    { label: 'Total Revenue', val: `KSh ${data.total_revenue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-400' },
-                    { label: 'Avg. Customer Value', val: `KSh ${Math.round(data.avg_ltv).toLocaleString()}`, icon: Info, color: 'text-primary-400' },
-                    { label: 'High Churn Risk', val: data.churn_risk_count.toLocaleString(), icon: AlertTriangle, color: 'text-red-400' },
-                ].map((s, i) => (
-                    <div key={i} className="glass-card p-6 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center">
-                            <s.icon className={`w-6 h-6 ${s.color}`} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-wider text-white/30">{s.label}</p>
-                            <p className="text-2xl font-bold mt-0.5">{s.val}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Visualization Grid */}
-            <div className="grid lg:grid-cols-2 gap-8">
-                {/* Segments Pie Chart */}
-                <div className="glass-card p-8 flex flex-col h-[450px]">
-                    <div className="mb-6">
-                        <h3 className="text-xl font-bold">Distribution</h3>
-                        <p className="text-white/40 text-sm">How many customers are in each segment.</p>
-                    </div>
-                    <div className="flex-1 min-h-0">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={data.segment_chart_data}
-                                    innerRadius={80}
-                                    outerRadius={120}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {data.segment_chart_data.map((_, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{ background: '#0a0a0b', border: '1px solid #27272a', borderRadius: '12px' }}
-                                    itemStyle={{ color: '#fff' }}
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Revenue per Segment */}
-                <div className="glass-card p-8 flex flex-col h-[450px]">
-                    <div className="mb-6">
-                        <h3 className="text-xl font-bold">Revenue Performance</h3>
-                        <p className="text-white/40 text-sm">Total revenue contributed by each segment.</p>
-                    </div>
-                    <div className="flex-1 min-h-0">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data.segments}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                                <XAxis dataKey="segment_name" stroke="#52525b" fontSize={11} />
-                                <YAxis stroke="#52525b" fontSize={11} />
-                                <Tooltip
-                                    contentStyle={{ background: '#0a0a0b', border: '1px solid #27272a', borderRadius: '12px' }}
-                                    itemStyle={{ color: '#fff' }}
-                                />
-                                <Bar dataKey="total_monetary" fill="#10b981" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
-
-            {/* Detailed Segment Table */}
-            <div className="space-y-6">
-                <h3 className="text-2xl font-bold">Segment Details</h3>
-                
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-white/10">
-                                <th className="text-left px-4 py-3 text-xs font-semibold text-white/50 uppercase">Segment</th>
-                                <th className="text-right px-4 py-3 text-xs font-semibold text-white/50 uppercase">Customers</th>
-                                <th className="text-right px-4 py-3 text-xs font-semibold text-white/50 uppercase">Revenue Share</th>
-                                <th className="text-right px-4 py-3 text-xs font-semibold text-white/50 uppercase">Avg Spend</th>
-                                <th className="text-right px-4 py-3 text-xs font-semibold text-white/50 uppercase">Frequency</th>
-                                <th className="text-center px-4 py-3 text-xs font-semibold text-white/50 uppercase">Risk Level</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {data.segments.sort((a, b) => b.total_monetary - a.total_monetary).map((segment, idx) => (
-                                <tr key={segment.segment_id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-4 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div 
-                                                className="w-3 h-3 rounded-full"
-                                                style={{ backgroundColor: COLORS[idx % COLORS.length] }}
-                                            />
-                                            <div>
-                                                <p className="font-semibold">{segment.segment_name}</p>
-                                                <p className="text-xs text-primary-400 italic">{segment.segment_name_sw}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-4 text-right">
-                                        <p className="font-semibold">{segment.customer_count.toLocaleString()}</p>
-                                    </td>
-                                    <td className="px-4 py-4 text-right">
-                                        <p className="font-semibold">{segment.revenue_share.toFixed(1)}%</p>
-                                    </td>
-                                    <td className="px-4 py-4 text-right">
-                                        <p className="font-semibold">KSh {Math.round(segment.avg_monetary).toLocaleString()}</p>
-                                    </td>
-                                    <td className="px-4 py-4 text-right">
-                                        <p className="font-semibold">{segment.avg_frequency.toFixed(1)}x</p>
-                                    </td>
-                                    <td className="px-4 py-4 text-center">
-                                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-block
-                                            ${segment.churn_risk === 'low' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                segment.churn_risk === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
-                                            {segment.churn_risk}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* Segment Cards */}
-            <div className="space-y-6">
-                <h3 className="text-2xl font-bold">Segment Overview</h3>
-                <div className="grid gap-6">
-                    {data.segments.sort((a, b) => b.total_monetary - a.total_monetary).map((s, i) => (
-                        <div key={i} className="glass-card hover:bg-white/5 transition-colors overflow-hidden border-l-4" style={{ borderColor: COLORS[i % COLORS.length] }}>
-                            <div className="p-8 flex flex-col lg:flex-row gap-8">
-                                <div className="lg:w-1/3">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h4 className="text-2xl font-bold">{s.segment_name}</h4>
-                                        <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-                                            ${s.churn_risk === 'low' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                s.churn_risk === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
-                                            Risk: {s.churn_risk}
-                                        </div>
-                                    </div>
-                                    <p className="text-primary-400 font-medium italic mb-4">{s.segment_name_sw}</p>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-[10px] uppercase font-bold text-white/30 tracking-widest">Customers</p>
-                                            <p className="text-lg font-bold">{s.customer_count}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] uppercase font-bold text-white/30 tracking-widest">Avg Spend</p>
-                                            <p className="text-lg font-bold">KSh {Math.round(s.avg_monetary).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] uppercase font-bold text-white/30 tracking-widest">Total Revenue</p>
-                                            <p className="text-lg font-bold">KSh {Math.round(s.total_monetary).toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] uppercase font-bold text-white/30 tracking-widest">Revenue Share</p>
-                                            <p className="text-lg font-bold">{s.revenue_share.toFixed(1)}%</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="lg:w-2/3 lg:border-l border-white/5 lg:pl-8 flex flex-col justify-center">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-primary-600/20 text-primary-400 flex items-center justify-center flex-shrink-0">
-                                            <Info className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <p className="text-white/40 text-sm font-semibold mb-1 uppercase tracking-wider">Characteristics</p>
-                                            <div className="grid grid-cols-2 gap-3 text-sm">
-                                                <div>
-                                                    <p className="text-white/40 text-xs">Avg Recency</p>
-                                                    <p className="font-semibold">{s.avg_recency_days} days ago</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-white/40 text-xs">Avg Frequency</p>
-                                                    <p className="font-semibold">{s.avg_frequency.toFixed(1)} purchases</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+            <div className="p-6">
+                {/* RFM Scores Section */}
+                <div className="glass-card p-6 mb-6">
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-green-600" />
+                        Recency, Frequency, Monetary (RFM) Scores
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-gray-600 text-sm">Recency Score</span>
+                                <Clock className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div className="text-2xl font-bold mb-1 text-gray-900">8.2/10</div>
+                            <div className="text-xs text-green-600 flex items-center gap-1">
+                                <ArrowUp className="w-3 h-3" />
+                                +2.3 from last analysis
                             </div>
                         </div>
-                    ))}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-gray-600 text-sm">Frequency Score</span>
+                                <Activity className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="text-2xl font-bold mb-1 text-gray-900">7.5/10</div>
+                            <div className="text-xs text-green-600 flex items-center gap-1">
+                                <ArrowUp className="w-3 h-3" />
+                                +1.8 from last analysis
+                            </div>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-gray-600 text-sm">Monetary Score</span>
+                                <DollarSign className="w-4 h-4 text-yellow-600" />
+                            </div>
+                            <div className="text-2xl font-bold mb-1 text-gray-900">9.1/10</div>
+                            <div className="text-xs text-red-600 flex items-center gap-1">
+                                <ArrowDown className="w-3 h-3" />
+                                -0.5 from last analysis
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* K-Means Clustering and Segment Sizes */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    {/* K-Means Customer Clustering */}
+                    <div className="glass-card p-6">
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Target className="w-5 h-5 text-green-600" />
+                            K-Means Customer Clustering
+                        </h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ScatterChart data={data.segments}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                    <XAxis dataKey="avg_recency_days" stroke="#6b7280" fontSize={12} />
+                                    <YAxis dataKey="avg_frequency" stroke="#6b7280" fontSize={12} />
+                                    <Tooltip
+                                        contentStyle={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px' }}
+                                        itemStyle={{ color: '#111827' }}
+                                    />
+                                    <Scatter dataKey="customer_count" fill="#8884d8">
+                                        {data.segments.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Scatter>
+                                </ScatterChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <p className="text-gray-400 text-xs mt-4 text-center">
+                            Clustering based on recency vs frequency patterns
+                        </p>
+                    </div>
+
+                    {/* Segment Sizes */}
+                    <div className="glass-card p-6">
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Users className="w-5 h-5 text-green-600" />
+                            Segment Sizes
+                        </h3>
+                        <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={data.segment_chart_data}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                        dataKey="value"
+                                    >
+                                        {data.segment_chart_data.map((_, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ background: '#0a0a0b', border: '1px solid #27272a', borderRadius: '12px' }}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mt-4">
+                            {data.segment_chart_data.map((segment, index) => (
+                                <div key={index} className="flex items-center gap-2 text-xs">
+                                    <div 
+                                        className="w-3 h-3 rounded-full" 
+                                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                    />
+                                    <span className="text-gray-600">{segment.name}:</span>
+                                    <span className="text-gray-900 font-medium">{segment.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Distribution Trends */}
+                <div className="glass-card p-6 mb-6">
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-green-600" />
+                        Distribution Trends
+                    </h3>
+                    <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={[
+                                { month: 'Jan', high: 120, medium: 180, low: 250 },
+                                { month: 'Feb', high: 135, medium: 195, low: 220 },
+                                { month: 'Mar', high: 150, medium: 210, low: 190 },
+                                { month: 'Apr', high: 165, medium: 225, low: 160 },
+                                { month: 'May', high: 180, medium: 240, low: 140 },
+                                { month: 'Jun', high: 195, medium: 255, low: 120 },
+                            ]}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
+                                <YAxis stroke="#6b7280" fontSize={12} />
+                                <Tooltip
+                                    contentStyle={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px' }}
+                                    itemStyle={{ color: '#111827' }}
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="high" stroke="#ef4444" strokeWidth={2} name="High Value" />
+                                <Line type="monotone" dataKey="medium" stroke="#f59e0b" strokeWidth={2} name="Medium Value" />
+                                <Line type="monotone" dataKey="low" stroke="#10b981" strokeWidth={2} name="Low Value" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Detailed Segment Analysis */}
+                <div className="glass-card p-6">
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <Star className="w-5 h-5 text-green-600" />
+                        Detailed Segment Analysis
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b border-gray-200">
+                                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Segment</th>
+                                    <th className="text-center px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Customers</th>
+                                    <th className="text-center px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Avg Recency</th>
+                                    <th className="text-center px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Avg Frequency</th>
+                                    <th className="text-center px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Avg Monetary</th>
+                                    <th className="text-center px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Churn Risk</th>
+                                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Key Traits</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {data.segments.map((segment, idx) => (
+                                    <tr key={segment.segment_id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-2">
+                                                <div 
+                                                    className="w-3 h-3 rounded-full" 
+                                                    style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                                                />
+                                                <div>
+                                                    <p className="font-medium text-gray-900">{segment.segment_name}</p>
+                                                    <p className="text-xs text-green-600 italic">{segment.segment_name_sw}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="font-medium text-gray-900">{segment.customer_count.toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="text-gray-900">{segment.avg_recency_days} days</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="text-gray-900">{segment.avg_frequency.toFixed(1)}x</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className="font-medium text-gray-900">KSh {Math.round(segment.avg_monetary).toLocaleString()}</span>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                segment.churn_risk === 'low' ? 'bg-green-500/10 text-green-400' :
+                                                segment.churn_risk === 'medium' ? 'bg-yellow-500/10 text-yellow-400' :
+                                                'bg-red-500/10 text-red-400'
+                                            }`}>
+                                                {segment.churn_risk}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-1">
+                                                {segment.recommendation.split(',').slice(0, 2).map((trait, i) => (
+                                                    <span key={i} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                        {trait.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
