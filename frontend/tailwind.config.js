@@ -33,13 +33,19 @@ export default {
           800: '#166534',
           900: '#14532d',
         },
-        // Dark dashboard surfaces
+        // Light theme surfaces
         surface: {
-          950: '#0a0e1a',
-          900: '#0f1629',
-          800: '#151e36',
-          700: '#1c2a4a',
-          600: '#243358',
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+          950: '#030712',
         },
       },
       fontFamily: {
@@ -48,11 +54,11 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-gradient': 'linear-gradient(135deg, #0f1629 0%, #1c2a4a 50%, #243358 100%)',
+        'hero-gradient': 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%, #e5e7eb 100%)',
       },
       boxShadow: {
-        'glass': '0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)',
-        'card': '0 2px 16px rgba(0,0,0,0.2)',
+        'glass': '0 4px 24px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8)',
+        'card': '0 2px 16px rgba(0,0,0,0.08)',
       },
     },
   },
