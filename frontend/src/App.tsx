@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { FlowProvider } from './context/FlowContext';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import DashboardLayout from './pages/DashboardLayout';
@@ -8,7 +9,11 @@ import Upload from './pages/Upload';
 import History from './pages/History';
 import AnalysisDetails from './pages/AnalysisDetails';
 import SegmentsView from './pages/SegmentsView';
+import Segmentation from './pages/Segmentation';
+import SegmentAnalysis from './pages/SegmentAnalysis';
+import Validate from './pages/Validate';
 import Predictions from './pages/Predictions';
+import PredictionsDashboard from './pages/PredictionsDashboard';
 import RecommendationsView from './pages/Recommendations';
 import SettingsPage from './pages/Settings';
 
@@ -19,7 +24,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-surface-950 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
         <div className="spinner" />
       </div>
     );
@@ -49,7 +54,11 @@ function AppRoutes() {
       >
         <Route index element={<Overview />} />
         <Route path="upload" element={<Upload />} />
+        <Route path="validate/:id" element={<Validate />} />
+        <Route path="analysis/:id/segment" element={<SegmentAnalysis />} />
+        <Route path="segmentation" element={<Segmentation />} />
         <Route path="history" element={<History />} />
+        <Route path="predictions" element={<PredictionsDashboard />} />
         <Route path="analysis/:id" element={<AnalysisDetails />} />
         <Route path="analysis/:id/segments" element={<SegmentsView />} />
         <Route path="analysis/:id/predictions" element={<Predictions />} />
@@ -64,9 +73,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <FlowProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </FlowProvider>
     </AuthProvider>
   );
 }
