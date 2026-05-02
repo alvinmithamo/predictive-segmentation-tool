@@ -1,83 +1,83 @@
-import { useState, useEffect } from 'react';
+// import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Target, Users, BarChart3, TrendingUp, FileText, Plus, Eye, Star, ArrowUp, ArrowDown, DollarSign, Calendar, Zap, AlertTriangle
+    Users, BarChart3, TrendingUp, FileText, Plus, Star, ArrowUp, Calendar, Zap, AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
 
-interface AnalysisSummary {
-    id: string;
-    filename: string;
-    status: 'pending' | 'processing' | 'done' | 'failed';
-    created_at: string;
-    row_count: number;
-    segments_identified?: number;
-    coverage?: string;
-    thumbnail?: string;
-}
+// interface AnalysisSummary {
+//     id: string;
+//     filename: string;
+//     status: 'pending' | 'processing' | 'done' | 'failed';
+//     created_at: string;
+//     row_count: number;
+//     segments_identified?: number;
+//     coverage?: string;
+//     thumbnail?: string;
+// }
 
 export default function Segmentation() {
-    const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    // const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
+    // const [isLoading, setIsLoading] = useState(true);
 
     // Mock data for completed analyses
-    const mockAnalyses = [
-        {
-            id: '1',
-            filename: 'Q3 Harvest Surge',
-            status: 'done' as const,
-            created_at: '2024-03-15T10:30:00Z',
-            row_count: 2847,
-            segments_identified: 5,
-            coverage: '87%',
-            thumbnail: '📊'
-        },
-        {
-            id: '2',
-            filename: 'Loyalty Churn Audit',
-            status: 'done' as const,
-            created_at: '2024-02-28T14:20:00Z',
-            row_count: 1923,
-            segments_identified: 4,
-            coverage: '92%',
-            thumbnail: '🎯'
-        },
-        {
-            id: '3',
-            filename: 'Mid-Year Bulk Sales',
-            status: 'done' as const,
-            created_at: '2024-01-10T09:15:00Z',
-            row_count: 3562,
-            segments_identified: 6,
-            coverage: '78%',
-            thumbnail: '📈'
-        },
-        {
-            id: '4',
-            filename: 'Baseline Performance',
-            status: 'done' as const,
-            created_at: '2023-12-05T16:45:00Z',
-            row_count: 1234,
-            segments_identified: 3,
-            coverage: '95%',
-            thumbnail: '⚡'
-        },
-    ];
+    // const mockAnalyses = [
+    //     {
+    //         id: '1',
+    //         filename: 'Q3 Harvest Surge',
+    //         status: 'done' as const,
+    //         created_at: '2024-03-15T10:30:00Z',
+    //         row_count: 2847,
+    //         segments_identified: 5,
+    //         coverage: '87%',
+    //         thumbnail: '📊'
+    //     },
+    //     {
+    //         id: '2',
+    //         filename: 'Loyalty Churn Audit',
+    //         status: 'done' as const,
+    //         created_at: '2024-02-28T14:20:00Z',
+    //         row_count: 1923,
+    //         segments_identified: 4,
+    //         coverage: '92%',
+    //         thumbnail: '🎯'
+    //     },
+    //     {
+    //         id: '3',
+    //         filename: 'Mid-Year Bulk Sales',
+    //         status: 'done' as const,
+    //         created_at: '2024-01-10T09:15:00Z',
+    //         row_count: 3562,
+    //         segments_identified: 6,
+    //         coverage: '78%',
+    //         thumbnail: '📈'
+    //     },
+    //     {
+    //         id: '4',
+    //         filename: 'Baseline Performance',
+    //         status: 'done' as const,
+    //         created_at: '2023-12-05T16:45:00Z',
+    //         row_count: 1234,
+    //         segments_identified: 3,
+    //         coverage: '95%',
+    //         thumbnail: '⚡'
+    //     },
+    // ];
 
-    useEffect(() => {
-        // Use mock data for now
-        setAnalyses(mockAnalyses);
-        setIsLoading(false);
-    }, []);
+    // useEffect(() => {
+    //     // Use mock data for now
+    //     setAnalyses(mockAnalyses);
+    //     setIsLoading(false);
+    // }, []);
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center p-20 text-gray-400">
-                <div className="w-8 h-8 animate-spin mb-4 border-2 border-gray-400 border-t-green-600 rounded-full"></div>
-                <p>Loading segmentation analyses...</p>
-            </div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex flex-col items-center justify-center p-20 text-gray-400">
+    //             <div className="w-8 h-8 animate-spin mb-4 border-2 border-gray-400 border-t-green-600 rounded-full"></div>
+    //             <p>Loading segmentation analyses...</p>
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className="min-h-screen bg-surface-50">

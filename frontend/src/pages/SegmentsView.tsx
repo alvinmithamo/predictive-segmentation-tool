@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-    Users, TrendingUp, AlertTriangle, ArrowLeft, Calendar, FileText,
-    CheckCircle2, Loader2, Target, BarChart3, Activity, Zap, Clock, DollarSign, Star, ArrowUp, ArrowDown
+    Users, TrendingUp, FileText,
+    Loader2, Target, BarChart3, Activity, Clock, DollarSign, Star, ArrowUp, ArrowDown
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, XAxis, YAxis, CartesianGrid, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 import api from '../lib/api';
 
 interface Segment {
@@ -149,7 +149,7 @@ export default function SegmentsView() {
                                         itemStyle={{ color: '#111827' }}
                                     />
                                     <Scatter dataKey="customer_count" fill="#8884d8">
-                                        {data.segments.map((entry, index) => (
+                                        {data.segments.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Scatter>

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, BarChart3, Users, TrendingUp, ArrowRight, FileText, Calendar, Loader2, AlertCircle, Search, Bell, ChevronDown, Cloud, Smartphone, MessageSquare, AlertTriangle, Target, Zap } from 'lucide-react';
+import { Users, TrendingUp, ArrowRight, FileText, Search, Bell, Cloud, MessageSquare, AlertTriangle, Target, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { format } from 'date-fns';
-import api from '../lib/api';
+// import { format } from 'date-fns';
+// import api from '../lib/api';
 
 const businessMetrics = [
     { 
@@ -66,35 +66,35 @@ const recentInsights = [
     },
 ];
 
-interface AnalysisSummary {
-    id: string;
-    filename: string;
-    status: 'pending' | 'processing' | 'done' | 'failed';
-    created_at: string;
-    row_count: number;
-    error_message?: string;
-}
+// interface AnalysisSummary {
+//     id: string;
+//     filename: string;
+//     status: 'pending' | 'processing' | 'done' | 'failed';
+//     created_at: string;
+//     row_count: number;
+//     error_message?: string;
+// }
 
 export default function Overview() {
     const { user } = useAuth();
-    const [recentAnalyses, setRecentAnalyses] = useState<AnalysisSummary[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // const [recentAnalyses, setRecentAnalyses] = useState<AnalysisSummary[]>([]);
+    // const [isLoading, setIsLoading] = useState(true);
+    // const [error, setError] = useState<string | null>(null);
     
-    useEffect(() => {
-        const fetchAnalyses = async () => {
-            try {
-                const { data } = await api.get('/api/analysis');
-                setRecentAnalyses(data.slice(0, 5));
-            } catch (err) {
-                setError('Failed to load recent analyses.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchAnalyses = async () => {
+    //         try {
+    //             const { data } = await api.get('/api/analysis');
+    //             setRecentAnalyses(data.slice(0, 5));
+    //         } catch (err) {
+    //             setError('Failed to load recent analyses.');
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     };
 
-        fetchAnalyses();
-    }, []);
+    //     fetchAnalyses();
+    // }, []);
 
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Habari za asubuhi' : hour < 17 ? 'Habari za mchana' : 'Habari za jioni';

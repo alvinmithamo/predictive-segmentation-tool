@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Loader2, TrendingUp, AlertTriangle, Target, BarChart3, Users, AlertCircle, Zap, FileText, Activity
+    Loader2, TrendingUp, AlertTriangle, Target, BarChart3, Users, Zap, FileText, Activity
 } from 'lucide-react';
-import api from '../lib/api';
+// import api from '../lib/api';
 
 interface AnalysisSummary {
     id: string;

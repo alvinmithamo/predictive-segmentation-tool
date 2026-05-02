@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-    Loader2, Target, Users, BarChart3, TrendingUp, FileText, Plus, Eye, Star, 
-    ArrowUp, ArrowDown, DollarSign, Calendar, Zap, AlertTriangle, ArrowRight, ArrowLeft
+    Loader2, Target, Users, TrendingUp, FileText, Star, 
+    AlertTriangle, ArrowRight, ArrowLeft,
+    DollarSign
 } from 'lucide-react';
 import { format } from 'date-fns';
 import api from '../lib/api';

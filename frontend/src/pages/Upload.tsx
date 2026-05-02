@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { Upload as UploadIcon, FileText, X, CheckCircle2, AlertCircle, Loader2, ArrowRight, Cloud, AlertTriangle, FileSpreadsheet, Clock, Filter } from 'lucide-react';
+import { FileText, AlertCircle, Loader2, ArrowRight, Cloud, AlertTriangle, FileSpreadsheet, Filter } from 'lucide-react';
 import api from '../lib/api';
 import FlowProgress from '../components/FlowProgress';
 
@@ -24,7 +24,7 @@ export default function Upload() {
     const [result, setResult] = useState<UploadResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [processingProgress, setProcessingProgress] = useState(0);
-    const [validationAlerts, setValidationAlerts] = useState([
+    const [validationAlerts] = useState([
         { id: 1, type: 'warning', message: '12 rows have missing M-Pesa IDs' },
         { id: 2, type: 'error', message: 'Date format mismatch in column 2' }
     ]);
@@ -207,6 +207,13 @@ export default function Upload() {
                                 </div>
                             )}
                         </div>
+                        
+                        {/* Error Display */}
+                        {error && (
+                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-red-600 text-sm">{error}</p>
+                            </div>
+                        )}
 
                         {/* Data Preview Section */}
                         {(file || step === 2) && (

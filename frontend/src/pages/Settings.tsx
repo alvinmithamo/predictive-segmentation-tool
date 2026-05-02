@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Settings as SettingsIcon, Shield, CheckCircle, Key, Smartphone, FileText, Trash2, RefreshCw, ExternalLink } from 'lucide-react';
+import { CheckCircle, FileText, Trash2, RefreshCw, ExternalLink, Smartphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const BUSINESS_TYPES = [
     'Retail / Duka',
@@ -16,8 +16,8 @@ const BUSINESS_TYPES = [
 ];
 
 export default function Settings() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+    const { user } = useAuth();
+    // const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
         email: user?.email || '',

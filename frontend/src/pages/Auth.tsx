@@ -3,21 +3,21 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { BarChart3, Eye, EyeOff, Loader, TrendingUp, Users, Shield, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const BUSINESS_TYPES = [
-    'Retail / Duka',
-    'Tourism & Hospitality',
-    'Fashion & Beauty',
-    'Food & Beverage',
-    'Agriculture',
-    'Healthcare',
-    'Education',
-    'Transport',
-    'Other',
-];
+// const BUSINESS_TYPES = [
+//     'Retail / Duka',
+//     'Tourism & Hospitality',
+//     'Fashion & Beauty',
+//     'Food & Beverage',
+//     'Agriculture',
+//     'Healthcare',
+//     'Education',
+//     'Transport',
+//     'Other',
+// ];
 
 export default function Auth() {
     const [searchParams] = useSearchParams();
-    const [mode, setMode] = useState<'login' | 'register'>(
+    const [mode] = useState<'login' | 'register'>(
         searchParams.get('mode') === 'register' ? 'register' : 'login'
     );
 

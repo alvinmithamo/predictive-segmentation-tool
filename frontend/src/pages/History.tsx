@@ -1,8 +1,8 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Calendar, Users, BarChart2, ChevronRight, AlertCircle, Loader2, Clock, Plus, Upload, RefreshCw, Eye, TrendingUp, Target, Zap, ArrowUp } from 'lucide-react';
+import { ChevronRight, Loader2, Plus, Upload, RefreshCw, Eye, TrendingUp, Target, ArrowUp } from 'lucide-react';
 import { format } from 'date-fns';
-import api from '../lib/api';
+// import api from '../lib/api';
 
 interface AnalysisSummary {
     id: string;
@@ -19,7 +19,7 @@ interface AnalysisSummary {
 export default function History() {
     const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // const [error, setError] = useState<string | null>(null);
     const [selectedAnalyses, setSelectedAnalyses] = useState<string[]>([]);
 
     // Mock data for saved analyses
@@ -108,20 +108,20 @@ export default function History() {
         }
     };
 
-    useEffect(() => {
-        const fetchAnalyses = async () => {
-            try {
-                const { data } = await api.get('/api/analysis');
-                setAnalyses(data);
-            } catch (err: any) {
-                setError('Failed to load analysis history.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchAnalyses = async () => {
+    //         try {
+    //             const { data } = await api.get('/api/analysis');
+    //             setAnalyses(data);
+    //         } catch (err: any) {
+    //             setError('Failed to load analysis history.');
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     };
 
-        fetchAnalyses();
-    }, []);
+    //     fetchAnalyses();
+    // }, []);
 
     if (isLoading) {
         return (

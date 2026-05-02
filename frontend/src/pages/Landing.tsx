@@ -41,7 +41,7 @@ export default function Landing() {
                         <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
                             <BarChart3 className="w-5 h-5" />
                         </div>
-                        <span className="font-display font-bold text-lg">Kenya SME Predictor</span>
+                        <span className="font-display font-bold text-lg">Growth Engine KE</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <Link to="/auth" className="btn-ghost text-sm">Sign In</Link>
